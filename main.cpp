@@ -2,5 +2,5 @@
 
 void main()
 {
-    std::cout << "Omelyan dupka lol";
+    std::cout << "Omelyan dupka lol exexexe";
 }
