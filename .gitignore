@@ -1,0 +1,41 @@
+# Сборка
+build/
+cmake-build-*/
+out/
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+
+# CMake 
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+_deps/
+Testing/
+
+# Покрытие
+*.gcda
+*.gcno
+*.gcov
+coverage/
+*.lcov
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# ОС
+.DS_Store
+Thumbs.db
+
+# Временное 
+*.log
+*.tmp
