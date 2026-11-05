@@ -91,7 +91,18 @@ double PhysicalActivity::calcKcal(double weightKg, double minutes_, Intensity in
         return 0.0;
     return met * intensityFactor(intensity_) * weightKg * (minutes_ / 60.0);
 }
+double PhysicalActivity::calcBurnedCalories(double weight, double minutes_, int intensity_) const
+{
+    // Допустимые значения интенсивности: 1, 2, 3
+    if (intensity_ < 1 || intensity_ > 3)
+        return 0.0;
 
+    // 1 -> Low (0), 2 -> Medium (1), 3 -> High (2)
+    Intensity level = static_cast<Intensity>(intensity_ - 1);
+
+    // Проверка weight и minutes_ на отрицательность уже есть в calcKcal
+    return calcKcal(weight, minutes_, level);
+}
 // Сравнение
 
 // Алфавитная сортировка без учёта регистра

@@ -38,6 +38,10 @@ private:
 
 public:
     // Конструкторы
+        // Расход калорий по контракту для напарника:
+    // intensity: 1 = лёгкая (0.8), 2 = средняя (1.0), 3 = высокая (1.2)
+    // При некорректных данных возвращает 0.0
+    double calcBurnedCalories(double weight, double minutes, int intensity) const;
     PhysicalActivity() = default; // нужен для чтения из файла
     PhysicalActivity(const std::string &name_,
                      double met_,
