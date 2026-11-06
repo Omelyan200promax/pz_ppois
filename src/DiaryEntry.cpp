@@ -1,5 +1,5 @@
 #include "DiaryEntry.hpp"
-#include "PhysicalActivity.h"
+#include "PhysicalActivity.hpp"
 #include <iomanip> // std::fixed, std::setprecision
 
 // Конструкторы

@@ -3,7 +3,7 @@
 #include <iomanip> // std::setw, std::fixed, std::setprecision
 #include <limits>  // std::numeric_limits
 
-// Свободные функции
+// Свободные функции.
 
 std::string mealTypeName(MealType t)
 {

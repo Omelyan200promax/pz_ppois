@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include "PhysicalActivity.h"
+#include "PhysicalActivity.hpp"
 // Конструктор
 
 ActivityCatalog::ActivityCatalog(const std::string &file)
