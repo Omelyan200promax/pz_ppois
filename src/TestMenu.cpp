@@ -1,5 +1,5 @@
 #include "TestMenu.hpp"
-#include "PhysicalActivity.h"
+#include "PhysicalActivity.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>

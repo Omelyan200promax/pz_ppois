@@ -4,7 +4,7 @@
 #include <limits>  // std::numeric_limits
 #include <string>
 
-// Конструкторы
+// Конструкторы.
 
 WaterRecord::WaterRecord(double amount_)
 {

@@ -3,7 +3,7 @@
 #include <limits>  // std::numeric_limits
 #include <string>
 
-// Конструкторы
+// Конструкторы.
 
 SleepRecord::SleepRecord(double hours_)
 {
