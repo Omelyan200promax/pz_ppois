@@ -26,7 +26,7 @@ private:
 
 public:
     // Конструкторы
-    Date();                    // по умолчанию (например, 01.01.2000)
+    Date() = default;          // по умолчанию (например, 01.01.2000)
     Date(int d, int m, int y); // с параметрами
 
     // Геттеры
@@ -64,6 +64,7 @@ public:
     void save(std::ofstream &out) const;
     void load(std::ifstream &in);
 
+    // Размер записи в бинарном файле (в байтах)
     static std::size_t binarySize();
 };
 

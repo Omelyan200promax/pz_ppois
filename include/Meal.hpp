@@ -29,9 +29,9 @@ std::string mealTypeName(MealType t);
 class Meal
 {
 private:
-    MealType type = MealType::Breakfast;
-    std::vector<Product> products; // съеденные продукты
-    std::vector<double> grams;     // граммовка, grams[i] относится к products[i]
+    MealType type = MealType::Breakfast; // тип приёма пищи (по умолчанию - завтрак)
+    std::vector<Product> products;       // съеденные продукты
+    std::vector<double> grams;           // граммовка, grams[i] относится к products[i]
 
 public:
     // Конструкторы

@@ -6,8 +6,7 @@
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::transform
 
-// Свободные функции
-
+// Возвращает множитель для MET в зависимости от интенсивности (низкая - 0.8, средняя - 1.0, высокая - 1.2)
 double intensityFactor(Intensity i)
 {
     switch (i)
@@ -22,6 +21,7 @@ double intensityFactor(Intensity i)
     return 1.0;
 }
 
+// Возвращает текстовое название интенсивности для вывода в консоль
 std::string intensityName(Intensity i)
 {
     switch (i)
@@ -36,8 +36,7 @@ std::string intensityName(Intensity i)
     return "?";
 }
 
-// Конструкторы
-
+// Конструктор: создает активность с заданными параметрами
 PhysicalActivity::PhysicalActivity(const std::string &name_, double met_, double minutes_, Intensity intensity_) : intensity(intensity_)
 {
     setName(name_);
@@ -45,15 +44,19 @@ PhysicalActivity::PhysicalActivity(const std::string &name_, double met_, double
     setMinutes(minutes_);
 }
 
-// Геттеры
-
+// Возвращает название активности
 std::string PhysicalActivity::getName() const { return std::string(name); }
+
+// Возвращает MET активности
 double PhysicalActivity::getMet() const { return met; }
+
+// Возвращает длительность активности в минутах
 double PhysicalActivity::getMinutes() const { return minutes; }
+
+// Возвращает интенсивность активности
 Intensity PhysicalActivity::getIntensity() const { return intensity; }
 
-// Сеттеры
-
+// Устанавливает название активности (обрезает до безопасной длины)
 void PhysicalActivity::setName(const std::string &newName)
 {
     // Обрезаем до NAME_SIZE - 1 символа, чтобы остался '\0'
@@ -61,39 +64,41 @@ void PhysicalActivity::setName(const std::string &newName)
     name[NAME_SIZE - 1] = '\0';
 }
 
+// Устанавливает MET активности (с проверкой на отрицательные значения)
 void PhysicalActivity::setMet(double v)
 {
     if (v >= 0.0)
         met = v;
 }
 
+// Устанавливает длительность активности в минутах (с проверкой на отрицательные значения)
 void PhysicalActivity::setMinutes(double v)
 {
     if (v >= 0.0)
         minutes = v;
 }
 
+// Устанавливает интенсивность активности
 void PhysicalActivity::setIntensity(Intensity i)
 {
     intensity = i;
 }
 
-// Расход калорий
-
+// Рассчитывает сожженные калории, используя время и интенсивность, сохраненные в объекте
 double PhysicalActivity::calcKcal(double weightKg) const
 {
     return calcKcal(weightKg, minutes, intensity);
 }
 
+// Рассчитывает сожженные калории по формуле: MET * множитель * вес * время (в часах)
 double PhysicalActivity::calcKcal(double weightKg, double minutes_, Intensity intensity_) const
 {
     if (weightKg < 0.0 || minutes_ < 0.0)
         return 0.0;
     return met * intensityFactor(intensity_) * weightKg * (minutes_ / 60.0);
 }
-// Сравнение
 
-// Алфавитная сортировка без учёта регистра
+// Оператор "меньше": алфавитная сортировка без учёта регистра
 bool PhysicalActivity::operator<(const PhysicalActivity &other) const
 {
     std::string a(name);
@@ -109,13 +114,13 @@ bool PhysicalActivity::operator<(const PhysicalActivity &other) const
     return a < b;
 }
 
+// Оператор равенства: сравнивает активности по названию
 bool PhysicalActivity::operator==(const PhysicalActivity &other) const
 {
     return std::strcmp(name, other.name) == 0;
 }
 
-// Ввод с консоли
-
+// Запрашивает у пользователя название и MET для добавления активности в каталог
 void PhysicalActivity::inputFromConsole()
 {
     std::string tmpName;
@@ -148,6 +153,7 @@ void PhysicalActivity::inputFromConsole()
     met = readDouble("MET активности (например, 9.8 для бега): ");
 }
 
+// Запрашивает у пользователя время и интенсивность для записи тренировки в дневник
 void PhysicalActivity::inputWorkoutFromConsole()
 {
     auto readDouble = [](const std::string &prompt) -> double
@@ -184,8 +190,7 @@ void PhysicalActivity::inputWorkoutFromConsole()
     intensity = static_cast<Intensity>(level - 1);
 }
 
-// Вывод в консоль
-
+// Выводит подробную информацию об активности (название, MET, время, интенсивность)
 void PhysicalActivity::print() const
 {
     std::cout << "-----------------------------\n";
@@ -197,6 +202,7 @@ void PhysicalActivity::print() const
     std::cout << "-----------------------------\n";
 }
 
+// Выводит компактную информацию об активности (для списка каталога)
 void PhysicalActivity::printShort() const
 {
     // setw считает байты, а кириллица в UTF-8 занимает 2 байта на букву,
@@ -213,8 +219,7 @@ void PhysicalActivity::printShort() const
               << "MET " << std::setw(5) << met << "\n";
 }
 
-// Бинарный файл
-
+// Сохраняет активность в бинарный файл
 void PhysicalActivity::save(std::ofstream &out) const
 {
     out.write(name, NAME_SIZE);
@@ -225,6 +230,7 @@ void PhysicalActivity::save(std::ofstream &out) const
     out.write(reinterpret_cast<const char *>(&level), sizeof(int));
 }
 
+// Загружает активность из бинарного файла (с защитой от поврежденных данных)
 void PhysicalActivity::load(std::ifstream &in)
 {
     in.read(name, NAME_SIZE);
@@ -240,6 +246,7 @@ void PhysicalActivity::load(std::ifstream &in)
     intensity = static_cast<Intensity>(level);
 }
 
+// Возвращает размер записи активности в файле (в байтах)
 std::size_t PhysicalActivity::binarySize()
 {
     return NAME_SIZE + sizeof(double) * 2 + sizeof(int);

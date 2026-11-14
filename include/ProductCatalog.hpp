@@ -32,6 +32,9 @@ public:
     // Поиск по имени, возвращает указатель или nullptr
     Product *findByName(const std::string &name);
 
+    // Поиск по части названия (без учёта регистра)
+    std::vector<Product> searchByName(const std::string &query) const;
+
     // Сортировка по алфавиту
     void sortAlphabetically();
 

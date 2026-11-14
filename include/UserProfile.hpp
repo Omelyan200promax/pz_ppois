@@ -6,60 +6,71 @@
 #include <fstream>
 #include <iostream>
 
+// Цель пользователя (определяет дефицит/профицит калорий и БЖУ)
 enum class Goal
 {
-    LOSE_WEIGHT,
-    CUTTING,
-    GAIN_MASS,
-    MAINTAIN
+    LOSE_WEIGHT, // Похудение
+    CUTTING,     // Сушка
+    GAIN_MASS,   // Набор массы
+    MAINTAIN     // Поддержание веса
 };
+
+// Статус пользователя (зависит от количества дней подряд в дневнике)
 enum class Status
 {
-    BEGINNER,
-    STARTED,
-    IRON_WILL,
-    MACHINE
+    BEGINNER,  // Новичок
+    STARTED,   // Начало положено
+    IRON_WILL, // Стальная сила воли
+    MACHINE    // Машина
 };
+
+// Пол (необходим для точного расчета базового метаболизма)
 enum class Gender
 {
-    MALE,
-    FEMALE
+    MALE,  // Мужской
+    FEMALE // Женский
 };
 
 class UserProfile
 {
 private:
-    char nickname[32] = {0};
+    // --- Личные данные пользователя ---
+    char nickname[32] = {0}; // Никнейм (используется как уникальный ID)
     int age = 0;
     double weight = 0.0;
     double height = 0.0;
     double bodyFat = 0.0;
     double targetWeight = 0.0;
+    int weeksToGoal = 0; // Желаемый срок достижения цели (в неделях)
     Goal goal = Goal::MAINTAIN;
-    int weeksToGoal = 0;
     Gender gender = Gender::MALE;
 
-    double avgActivityCalories = 0.0;
+    // --- Данные из дневника (обновляются извне) ---
+    double avgActivityCalories = 0.0; // Средний расход на активности в день
 
+    // --- Рассчитанные нормы (заполняются автоматически) ---
     double dailyCalories = 0.0;
     double dailyProteins = 0.0;
     double dailyFats = 0.0;
     double dailyCarbs = 0.0;
     double dailyWater = 0.0;
     double dailyFiber = 0.0;
-    double basalMetabolism = 0.0;
+    double basalMetabolism = 0.0; // BMR (базовый обмен веществ)
     double sleepHours = 0.0;
+    double optimalActivityCal = 0.0;
 
+    // --- Статус и уведомления ---
     Status status = Status::BEGINNER;
-    bool hasNewInfo = false;
+    bool hasNewInfo = false; // Флаг для отображения звездочки (есть новый статус)
 
-    void calcBasalMetabolism();
-    void calcDailyNorms();
+    // --- Вспомогательные методы расчета ---
+    void calcBasalMetabolism(); // Расчет BMR по формуле Миффлина-Сан Жеора
+    void calcDailyNorms();      // Пересчет всех норм (калории, БЖУ, вода, сон)
 
 public:
     UserProfile() = default;
 
-    // Геттеры (для Diary и Report)
+    // --- Геттеры (нужны для Diary, Report и Menu) ---
     std::string getNickname() const;
     int getAge() const;
     double getWeight() const;
@@ -79,24 +90,33 @@ public:
     Status getStatus() const;
     bool getHasNewInfo() const;
     double getAvgActivityCalories() const;
+    double getOptimalActivityCal() const;
 
-    // Сеттеры
+    // --- Сеттеры ---
     void setNickname(const std::string &nick);
+    // Установка среднего расхода калорий. Автоматически пересчитывает нормы.
     void setAvgActivityCalories(double cal);
 
-    // Основные методы
-    void inputInitialData();
-    void updateNorms();
-    bool isWeightLossSafe() const;
-    void updateStatus();
-    void markInfoAsRead();
-    void print() const;
-    void reset();
+    // --- Ввод и обновление ---
+    void inputInitialData(); // Ввод всех данных при первом запуске
+    void updateNorms();      // Принудительный пересчет норм
 
-    // Бинарный файл
+    // --- Проверки и статусы ---
+    bool isWeightLossSafe() const;     // Проверка на безопасный темп похудения
+    void updateStatus(int streakDays); // Обновление статуса на основе стрика (дней подряд)
+    void markInfoAsRead();             // Убрать звездочку нового статуса
+
+    // --- Вывод и сброс ---
+    void print() const; // Красивый вывод личных данных и норм
+    void reset();       // Сброс всех данных, кроме никнейма (пункт "Результат")
+
+    // --- Бинарный файл ---
     void save(std::ofstream &out) const;
     void load(std::ifstream &in);
-    static std::size_t binarySize();
+    static std::size_t binarySize(); // Размер записи в файле (в байтах)
+
+    // Рассчитывает рекомендуемое (безопасное) время достижения цели в неделях
+    int getOptimalWeeks() const;
 };
 
 #endif // USERPROFILE_HPP

@@ -3,8 +3,7 @@
 #include <iomanip> // std::setw, std::fixed, std::setprecision
 #include <limits>  // std::numeric_limits
 
-// Свободные функции.
-
+// Возвращает текстовое название приема пищи (например, "Завтрак")
 std::string mealTypeName(MealType t)
 {
     switch (t)
@@ -21,20 +20,18 @@ std::string mealTypeName(MealType t)
     return "?";
 }
 
-// Конструкторы
-
+// Конструктор: создает прием пищи заданного типа (по умолчанию - завтрак)
 Meal::Meal(MealType type_) : type(type_)
 {
 }
 
-// Геттер и сеттер
-
+// Возвращает тип приема пищи
 MealType Meal::getType() const { return type; }
 
+// Устанавливает тип приема пищи
 void Meal::setType(MealType t) { type = t; }
 
-// Работа со списком продуктов
-
+// Добавляет продукт с указанной граммовкой. Если продукт уже есть, суммирует граммы
 bool Meal::addProduct(const Product &p, double g)
 {
     if (g >= 0.0)
@@ -48,6 +45,7 @@ bool Meal::addProduct(const Product &p, double g)
                 return true;
             }
         }
+        // Если продукта нет, добавляем его в конец
         products.push_back(p);
         grams.push_back(g);
         return true;
@@ -55,6 +53,7 @@ bool Meal::addProduct(const Product &p, double g)
     return false;
 }
 
+// Запрашивает у пользователя граммовку продукта и добавляет его в прием пищи
 bool Meal::addProductFromConsole(const Product &p)
 {
     auto readDouble = [](const std::string &prompt) -> double
@@ -83,6 +82,7 @@ bool Meal::addProductFromConsole(const Product &p)
     return addProduct(p, g);
 }
 
+// Удаляет продукт из приема пищи по его названию
 bool Meal::removeProduct(const std::string &name)
 {
     for (std::size_t i = 0; i < products.size(); ++i)
@@ -97,34 +97,38 @@ bool Meal::removeProduct(const std::string &name)
     return false;
 }
 
+// Очищает прием пищи (удаляет все продукты и граммовки)
 void Meal::clear()
 {
     products.clear();
     grams.clear();
 }
 
+// Проверяет, пуст ли прием пищи
 bool Meal::isEmpty() const
 {
     return products.empty();
 }
 
+// Возвращает количество продуктов в приеме пищи
 std::size_t Meal::size() const
 {
     return products.size();
 }
 
+// Возвращает константную ссылку на список продуктов (для чтения)
 const std::vector<Product> &Meal::getProducts() const
 {
     return products;
 }
 
+// Возвращает константную ссылку на список граммовок (для чтения)
 const std::vector<double> &Meal::getGrams() const
 {
     return grams;
 }
 
-// Итоги
-
+// Считает и возвращает общее количество калорий в приеме пищи
 double Meal::getCalories() const
 {
     double sum = 0.0;
@@ -133,6 +137,7 @@ double Meal::getCalories() const
     return sum;
 }
 
+// Считает и возвращает общее количество белков в приеме пищи
 double Meal::getProteins() const
 {
     double sum = 0.0;
@@ -141,6 +146,7 @@ double Meal::getProteins() const
     return sum;
 }
 
+// Считает и возвращает общее количество жиров в приеме пищи
 double Meal::getFats() const
 {
     double sum = 0.0;
@@ -149,6 +155,7 @@ double Meal::getFats() const
     return sum;
 }
 
+// Считает и возвращает общее количество углеводов в приеме пищи
 double Meal::getCarbs() const
 {
     double sum = 0.0;
@@ -157,6 +164,7 @@ double Meal::getCarbs() const
     return sum;
 }
 
+// Считает и возвращает общее количество клетчатки в приеме пищи
 double Meal::getFiber() const
 {
     double sum = 0.0;
@@ -165,8 +173,7 @@ double Meal::getFiber() const
     return sum;
 }
 
-// Вывод в консоль
-
+// Выводит информацию о приеме пищи (список продуктов и итоговые БЖУ) в консоль
 void Meal::print() const
 {
     std::cout << std::fixed << std::setprecision(1);
@@ -191,8 +198,7 @@ void Meal::print() const
               << "Кл " << getFiber() << "\n";
 }
 
-// Бинарный файл
-
+// Сохраняет прием пищи (тип, продукты и граммовки) в бинарный файл
 void Meal::save(std::ofstream &out) const
 {
     int t = static_cast<int>(type);
@@ -210,6 +216,7 @@ void Meal::save(std::ofstream &out) const
     }
 }
 
+// Загружает прием пищи из бинарного файла (с защитой от поврежденных данных)
 void Meal::load(std::ifstream &in)
 {
     products.clear();
@@ -217,12 +224,16 @@ void Meal::load(std::ifstream &in)
 
     int t = 0;
     in.read(reinterpret_cast<char *>(&t), sizeof(int));
+
+    // Проверка на корректность типа приема пищи
     if (t < 0 || t > 3)
         t = 0; // повреждённое значение, ставим завтрак
     type = static_cast<MealType>(t);
 
     std::size_t count = 0;
     in.read(reinterpret_cast<char *>(&count), sizeof(count));
+
+    // Защита от слишком большого количества продуктов
     if (!in || count > 100000)
         return;
 

@@ -1,6 +1,13 @@
-#include <iostream>
+#include "TestDevMenu.hpp"
+#include <windows.h> // Подключаем библиотеку для работы с консолью Windows
 
-void main()
+int main()
 {
-    std::cout << "Omelyan dupka lol exexexe";
+    // Принудительно включаем UTF-8 для русского языка в консоли
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
+    TestDevMenu test;
+    test.run();
+    return 0;
 }
