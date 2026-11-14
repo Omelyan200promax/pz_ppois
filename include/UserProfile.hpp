@@ -88,7 +88,7 @@ public:
     void inputInitialData();
     void updateNorms();
     bool isWeightLossSafe() const;
-    void updateStatus();
+    void updateStatus(int streakDays);
     void markInfoAsRead();
     void print() const;
     void reset();

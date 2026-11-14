@@ -51,6 +51,13 @@ void UserProfile::setAvgActivityCalories(double cal)
 
 void UserProfile::inputInitialData()
 {
+    std::cout << "========================================\n";
+    std::cout << "  ВНИМАНИЕ! БЕЗОПАСНОЕ ПОХУДЕНИЕ\n";
+    std::cout << "========================================\n";
+    std::cout << "- Безопасный темп похудения: 0.5-1% массы тела в неделю.\n";
+    std::cout << "- Для снижения веса на 10 кг нужно минимум 2-3 месяца.\n";
+    std::cout << "========================================\n\n";
+
     std::cout << "Введите ваш никнейм (ID): ";
     std::string tmpNick;
     std::getline(std::cin >> std::ws, tmpNick);
@@ -214,11 +221,27 @@ bool UserProfile::isWeightLossSafe() const
     return true;
 }
 
-void UserProfile::updateStatus()
+void UserProfile::updateStatus(int streakDays)
 {
-    if (status == Status::BEGINNER)
+    Status newStatus = Status::BEGINNER;
+
+    if (streakDays >= 10)
     {
-        status = Status::STARTED;
+        newStatus = Status::MACHINE;
+    }
+    else if (streakDays >= 7)
+    {
+        newStatus = Status::IRON_WILL;
+    }
+    else if (streakDays >= 3)
+    {
+        newStatus = Status::STARTED;
+    }
+
+    // Если статус повысился, включаем звездочку
+    if (newStatus != status && status < newStatus)
+    { // нужно перегрузить оператор < для enum class или просто сравнить через приведение к int
+        status = newStatus;
         hasNewInfo = true;
     }
 }
