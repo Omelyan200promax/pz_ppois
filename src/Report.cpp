@@ -1,6 +1,10 @@
 #include "Report.hpp"
 #include <iomanip>
+#include <cmath> // для std::abs
 
+// Генерирует отчет на основе данных дневника и норм пользователя.
+// Проверяет наличие минимум 10 дней записей, считает средние значения (исключая пустые дни)
+// и выводит итоговый вердикт по калориям.
 void Report::generate(const Diary &diary, const UserProfile &user)
 {
     const auto &entries = diary.getAll();
@@ -84,6 +88,8 @@ void Report::generate(const Diary &diary, const UserProfile &user)
     std::cout << "========================================\n";
 }
 
+// Вспомогательный метод: сравнивает фактическое значение с целевым
+// и определяет вердикт на основе допустимого процента отклонения.
 Report::Verdict Report::checkVerdict(double actual, double target, double tolerancePercent)
 {
     if (target <= 0.0)
@@ -100,6 +106,7 @@ Report::Verdict Report::checkVerdict(double actual, double target, double tolera
         return Verdict::NOT_FOLLOWS;
 }
 
+// Возвращает текстовое название вердикта для вывода в консоль
 std::string Report::getVerdictName(Verdict v)
 {
     switch (v)

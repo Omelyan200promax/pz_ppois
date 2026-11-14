@@ -2,20 +2,18 @@
 #include "PhysicalActivity.hpp"
 #include <iomanip> // std::fixed, std::setprecision
 
-// Конструкторы
-
+// Конструктор: создает запись дневника на указанную дату
 DiaryEntry::DiaryEntry(const Date &date_) : date(date_)
 {
 }
 
-// Дата
-
+// Возвращает дату этой записи
 const Date &DiaryEntry::getDate() const { return date; }
 
+// Устанавливает новую дату для записи
 void DiaryEntry::setDate(const Date &d) { date = d; }
 
-// Доступ к частям записи
-
+// Возвращает ссылку на прием пищи (завтрак/обед/ужин/перекус) для редактирования
 Meal &DiaryEntry::getMeal(MealType t)
 {
     switch (t)
@@ -32,6 +30,7 @@ Meal &DiaryEntry::getMeal(MealType t)
     return breakfast;
 }
 
+// Возвращает константную ссылку на прием пищи (только для чтения)
 const Meal &DiaryEntry::getMeal(MealType t) const
 {
     switch (t)
@@ -48,19 +47,25 @@ const Meal &DiaryEntry::getMeal(MealType t) const
     return breakfast;
 }
 
+// Возвращает ссылку на запись о воде для редактирования
 WaterRecord &DiaryEntry::getWater() { return water; }
+
+// Возвращает константную ссылку на запись о воде (только для чтения)
 const WaterRecord &DiaryEntry::getWater() const { return water; }
 
+// Возвращает ссылку на запись о сне для редактирования
 SleepRecord &DiaryEntry::getSleep() { return sleep; }
+
+// Возвращает константную ссылку на запись о сне (только для чтения)
 const SleepRecord &DiaryEntry::getSleep() const { return sleep; }
 
-// Физические активности
-
+// Добавляет физическую активность в дневник за этот день
 void DiaryEntry::addActivity(const PhysicalActivity &a)
 {
     activities.push_back(a);
 }
 
+// Удаляет физическую активность по её названию
 bool DiaryEntry::removeActivity(const std::string &name)
 {
     for (auto it = activities.begin(); it != activities.end(); ++it)
@@ -74,43 +79,48 @@ bool DiaryEntry::removeActivity(const std::string &name)
     return false;
 }
 
+// Возвращает константную ссылку на список всех активностей за день
 const std::vector<PhysicalActivity> &DiaryEntry::getActivities() const
 {
     return activities;
 }
 
-// Итоги за день
-
+// Считает и возвращает сумму калорий за все приемы пищи
 double DiaryEntry::getTotalCalories() const
 {
     return breakfast.getCalories() + lunch.getCalories() +
            dinner.getCalories() + snack.getCalories();
 }
 
+// Считает и возвращает сумму белков за все приемы пищи
 double DiaryEntry::getTotalProteins() const
 {
     return breakfast.getProteins() + lunch.getProteins() +
            dinner.getProteins() + snack.getProteins();
 }
 
+// Считает и возвращает сумму жиров за все приемы пищи
 double DiaryEntry::getTotalFats() const
 {
     return breakfast.getFats() + lunch.getFats() +
            dinner.getFats() + snack.getFats();
 }
 
+// Считает и возвращает сумму углеводов за все приемы пищи
 double DiaryEntry::getTotalCarbs() const
 {
     return breakfast.getCarbs() + lunch.getCarbs() +
            dinner.getCarbs() + snack.getCarbs();
 }
 
+// Считает и возвращает сумму клетчатки за все приемы пищи
 double DiaryEntry::getTotalFiber() const
 {
     return breakfast.getFiber() + lunch.getFiber() +
            dinner.getFiber() + snack.getFiber();
 }
 
+// Считает общее количество сожженных калорий за все активности (нужен вес пользователя)
 double DiaryEntry::getBurnedKcal(double weightKg) const
 {
     double sum = 0.0;
@@ -121,6 +131,7 @@ double DiaryEntry::getBurnedKcal(double weightKg) const
     return sum;
 }
 
+// Проверяет, пуста ли запись (ничего не введено ни в один раздел)
 bool DiaryEntry::isEmpty() const
 {
     return breakfast.isEmpty() && lunch.isEmpty() &&
@@ -129,20 +140,19 @@ bool DiaryEntry::isEmpty() const
            activities.empty();
 }
 
-// Сравнение по дате
-
+// Оператор равенства: сравнивает записи по дате
 bool DiaryEntry::operator==(const DiaryEntry &other) const
 {
     return date == other.date;
 }
 
+// Оператор "меньше": сравнивает записи по дате (используется для сортировки)
 bool DiaryEntry::operator<(const DiaryEntry &other) const
 {
     return date < other.date;
 }
 
-// Вывод в консоль
-
+// Выводит полную информацию за день (еду, воду, сон, активности)
 void DiaryEntry::print(double waterNorm, double sleepNorm, double weightKg, double bmr) const
 {
     std::cout << "==============================\n";
@@ -184,8 +194,7 @@ void DiaryEntry::print(double waterNorm, double sleepNorm, double weightKg, doub
     std::cout << "==============================\n";
 }
 
-// Бинарный файл
-
+// Сохраняет запись (дату, еду, воду, сон, активности) в бинарный файл
 void DiaryEntry::save(std::ofstream &out) const
 {
     date.save(out);
@@ -205,6 +214,7 @@ void DiaryEntry::save(std::ofstream &out) const
     }
 }
 
+// Загружает запись из бинарного файла
 void DiaryEntry::load(std::ifstream &in)
 {
     date.load(in);
@@ -218,6 +228,8 @@ void DiaryEntry::load(std::ifstream &in)
     activities.clear();
     std::size_t count = 0;
     in.read(reinterpret_cast<char *>(&count), sizeof(count));
+
+    // Защита от поврежденных данных
     if (!in || count > 100000)
         return;
 

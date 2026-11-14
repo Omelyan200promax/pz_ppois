@@ -64,6 +64,7 @@ public:
     void save(std::ofstream &out) const;
     void load(std::ifstream &in);
 
+    // Размер записи в бинарном файле (в байтах)
     static std::size_t binarySize();
 };
 

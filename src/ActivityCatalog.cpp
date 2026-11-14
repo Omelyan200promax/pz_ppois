@@ -3,57 +3,57 @@
 #include <iostream>
 #include <algorithm>
 #include "PhysicalActivity.hpp"
-// Конструктор
 
+// Конструктор: загружает данные из файла или задает базовый набор активностей
 ActivityCatalog::ActivityCatalog(const std::string &file)
     : filename(file)
 {
-    // Нет файла или он повреждён - берём базовый набор
+    // Если файла нет или он повреждён, загружаем базовый набор
     if (!loadFromFile())
     {
         fillDefaults();
     }
 }
 
-// Заполнение по умолчанию
-
+// Заполняет каталог базовым набором активностей по умолчанию
 void ActivityCatalog::fillDefaults()
 {
     activities.clear();
 
-    // Низкая активность
+    // Низкая активность (MET 2.0 - 3.9)
     activities.push_back(PhysicalActivity("Ходьба", 3.0));
     activities.push_back(PhysicalActivity("Йога", 2.5));
     activities.push_back(PhysicalActivity("Пилатес", 3.0));
     activities.push_back(PhysicalActivity("Растяжка", 2.3));
 
-    // Средняя активность
+    // Средняя активность (MET 4.0 - 7.9)
     activities.push_back(PhysicalActivity("Плавание", 6.0));
     activities.push_back(PhysicalActivity("Велосипед", 6.0));
     activities.push_back(PhysicalActivity("Танцы", 5.5));
     activities.push_back(PhysicalActivity("Силовая тренировка", 5.0));
     activities.push_back(PhysicalActivity("Домашняя уборка", 4.5));
 
-    // Высокая активность
+    // Высокая активность (MET 8.0+)
     activities.push_back(PhysicalActivity("Бег", 9.8));
     activities.push_back(PhysicalActivity("Скакалка", 10.0));
     activities.push_back(PhysicalActivity("Бокс / Кикбоксинг", 9.0));
 }
 
-// Загрузка и сохранение
-
+// Загружает каталог активностей из бинарного файла
 bool ActivityCatalog::loadFromFile()
 {
     std::ifstream in(filename, std::ios::binary);
     if (!in.is_open())
     {
-        // Файла ещё нет
+        // Файла ещё нет, возвращаем false для загрузки дефолтных данных
         return false;
     }
 
     // Читаем количество записей
     std::size_t count = 0;
     in.read(reinterpret_cast<char *>(&count), sizeof(count));
+
+    // Защита от поврежденных данных (если count огромный, выделится много памяти)
     if (!in || count > 100000)
         return false;
 
@@ -72,6 +72,7 @@ bool ActivityCatalog::loadFromFile()
     return true;
 }
 
+// Сохраняет текущий каталог активностей в бинарный файл
 void ActivityCatalog::saveToFile() const
 {
     std::ofstream out(filename, std::ios::binary | std::ios::trunc);
@@ -93,8 +94,7 @@ void ActivityCatalog::saveToFile() const
     }
 }
 
-// Добавление, удаление, редактирование
-
+// Добавляет новую активность в каталог (с проверкой на дубликаты)
 bool ActivityCatalog::addActivity(const PhysicalActivity &a)
 {
     // Не допускаем дубликатов по названию
@@ -106,6 +106,7 @@ bool ActivityCatalog::addActivity(const PhysicalActivity &a)
     return true;
 }
 
+// Удаляет активность из каталога по её названию
 bool ActivityCatalog::removeActivity(const std::string &name)
 {
     for (auto it = activities.begin(); it != activities.end(); ++it)
@@ -119,6 +120,7 @@ bool ActivityCatalog::removeActivity(const std::string &name)
     return false;
 }
 
+// Редактирует существующую активность (заменяет данные по названию)
 bool ActivityCatalog::editActivity(const std::string &name,
                                    const PhysicalActivity &newData)
 {
@@ -130,8 +132,7 @@ bool ActivityCatalog::editActivity(const std::string &name,
     return true;
 }
 
-// Поиск
-
+// Ищет активность по названию и возвращает указатель на неё (или nullptr)
 PhysicalActivity *ActivityCatalog::findByName(const std::string &name)
 {
     for (auto &a : activities)
@@ -144,16 +145,14 @@ PhysicalActivity *ActivityCatalog::findByName(const std::string &name)
     return nullptr;
 }
 
-// Сортировка
-
+// Сортирует активности в каталоге по алфавиту
 void ActivityCatalog::sortAlphabetically()
 {
     // Используем operator< из PhysicalActivity
     std::sort(activities.begin(), activities.end());
 }
 
-// Вывод
-
+// Выводит список всех активностей в консоль
 void ActivityCatalog::printAll() const
 {
     if (activities.empty())
@@ -169,18 +168,19 @@ void ActivityCatalog::printAll() const
     }
 }
 
-// Вспомогательные методы
-
+// Проверяет, пуст ли каталог активностей
 bool ActivityCatalog::isEmpty() const
 {
     return activities.empty();
 }
 
+// Возвращает текущее количество активностей в каталоге
 std::size_t ActivityCatalog::size() const
 {
     return activities.size();
 }
 
+// Возвращает константную ссылку на вектор всех активностей
 const std::vector<PhysicalActivity> &ActivityCatalog::getAll() const
 {
     return activities;

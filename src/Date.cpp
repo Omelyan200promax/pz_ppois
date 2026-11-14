@@ -5,11 +5,10 @@
 #include <limits>
 #include <ctime>
 
-// Конструктор
-
+// Конструктор с параметрами: создает дату и проверяет её на корректность
 Date::Date(int d, int m, int y) : day(d), month(m), year(y)
 {
-    // Если передали мусор, сбрасываем на дефолт
+    // Если передали некорректную дату (например, 31.02), сбрасываем на дефолт
     if (!isValid())
     {
         day = 1;
@@ -18,14 +17,16 @@ Date::Date(int d, int m, int y) : day(d), month(m), year(y)
     }
 }
 
-// Геттеры
-
+// Возвращает день
 int Date::getDay() const { return day; }
+
+// Возвращает месяц
 int Date::getMonth() const { return month; }
+
+// Возвращает год
 int Date::getYear() const { return year; }
 
-// Сеттер
-
+// Устанавливает новую дату с проверкой на корректность
 void Date::setDate(int d, int m, int y)
 {
     Date temp(d, m, y);
@@ -37,13 +38,13 @@ void Date::setDate(int d, int m, int y)
     }
 }
 
-// Вспомогательные методы
-
+// Проверяет, является ли год високосным
 bool Date::isLeapYear(int y) const
 {
     return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
 }
 
+// Возвращает количество дней в указанном месяце (с учетом високосного года)
 int Date::daysInMonth(int m, int y) const
 {
     if (m == 4 || m == 6 || m == 9 || m == 11)
@@ -53,6 +54,7 @@ int Date::daysInMonth(int m, int y) const
     return 31;
 }
 
+// Проверяет, существует ли такая дата в календаре
 bool Date::isValid() const
 {
     if (year < 1900 || year > 2100)
@@ -64,8 +66,7 @@ bool Date::isValid() const
     return true;
 }
 
-// Форматирование и парсинг
-
+// Преобразует дату в строку формата "ДД.ММ.ГГГГ"
 std::string Date::toString() const
 {
     std::ostringstream oss;
@@ -76,6 +77,7 @@ std::string Date::toString() const
     return oss.str();
 }
 
+// Создает объект даты из строки формата "ДД.ММ.ГГГГ"
 Date Date::fromString(const std::string &str)
 {
     Date d;
@@ -94,18 +96,19 @@ Date Date::fromString(const std::string &str)
     return d;
 }
 
-// Операторы сравнения
-
+// Оператор равенства: сравнивает день, месяц и год
 bool Date::operator==(const Date &other) const
 {
     return day == other.day && month == other.month && year == other.year;
 }
 
+// Оператор неравенства
 bool Date::operator!=(const Date &other) const
 {
     return !(*this == other);
 }
 
+// Оператор "меньше" (используется для сортировки записей по дате)
 bool Date::operator<(const Date &other) const
 {
     if (year != other.year)
@@ -115,23 +118,25 @@ bool Date::operator<(const Date &other) const
     return day < other.day;
 }
 
+// Оператор "меньше или равно"
 bool Date::operator<=(const Date &other) const
 {
     return *this < other || *this == other;
 }
 
+// Оператор "больше"
 bool Date::operator>(const Date &other) const
 {
     return !(*this <= other);
 }
 
+// Оператор "больше или равно"
 bool Date::operator>=(const Date &other) const
 {
     return !(*this < other);
 }
 
-// Ввод с консоли
-
+// Запрашивает дату у пользователя с консоли (с поддержкой команды 'now')
 void Date::inputFromConsole()
 {
     while (true)
@@ -140,6 +145,7 @@ void Date::inputFromConsole()
         std::string input;
         std::getline(std::cin >> std::ws, input);
 
+        // Если введено 'now', берем текущую системную дату
         if (input == "now")
         {
             std::time_t t = std::time(nullptr);
@@ -160,15 +166,13 @@ void Date::inputFromConsole()
     }
 }
 
-// Вывод в консоль
-
+// Выводит дату в консоль
 void Date::print() const
 {
     std::cout << toString();
 }
 
-// Бинарный файл
-
+// Сохраняет дату в бинарный файл (3 числа типа int)
 void Date::save(std::ofstream &out) const
 {
     out.write(reinterpret_cast<const char *>(&day), sizeof(int));
@@ -176,6 +180,7 @@ void Date::save(std::ofstream &out) const
     out.write(reinterpret_cast<const char *>(&year), sizeof(int));
 }
 
+// Загружает дату из бинарного файла
 void Date::load(std::ifstream &in)
 {
     in.read(reinterpret_cast<char *>(&day), sizeof(int));
@@ -183,6 +188,7 @@ void Date::load(std::ifstream &in)
     in.read(reinterpret_cast<char *>(&year), sizeof(int));
 }
 
+// Возвращает размер записи даты в файле (в байтах)
 std::size_t Date::binarySize()
 {
     return sizeof(int) * 3; // 12 байт

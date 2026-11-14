@@ -1,11 +1,11 @@
 #include "Calendar.hpp"
 
-// Конструктор
+// Конструктор: сохраняет ссылку на дневник для дальнейшей работы
 Calendar::Calendar(Diary &d) : diary(d)
 {
 }
 
-// Вывод всех записей
+// Выводит список всех записей дневника, если они есть
 void Calendar::printAll() const
 {
     if (diary.isEmpty())
@@ -18,11 +18,10 @@ void Calendar::printAll() const
     diary.printAll();
 }
 
-// Поиск по дате
+// Ищет запись по конкретной дате и выводит её на экран
 void Calendar::searchByDate(const Date &date) const
 {
-    // Ищем запись, но так как метод findByDate в Diary не константный,
-    // нам придется использовать метод getAll для поиска
+    // Ищем запись через getAll, так как сам метод поиска не константный
     const auto &entries = diary.getAll();
     bool found = false;
 
@@ -30,7 +29,7 @@ void Calendar::searchByDate(const Date &date) const
     {
         if (entry.getDate() == date)
         {
-            entry.print(); // Выводим подробную информацию о записи
+            entry.print(); // Выводим подробную информацию о найденной записи
             found = true;
             break;
         }
@@ -42,7 +41,7 @@ void Calendar::searchByDate(const Date &date) const
     }
 }
 
-// Удаление по дате
+// Удаляет запись из дневника по указанной дате
 bool Calendar::deleteByDate(const Date &date)
 {
     if (diary.removeEntry(date))
@@ -55,7 +54,7 @@ bool Calendar::deleteByDate(const Date &date)
     return false;
 }
 
-// Получить запись для редактирования
+// Возвращает указатель на запись для редактирования (создает новую, если такой нет)
 DiaryEntry *Calendar::getEntryForEditing(const Date &date)
 {
     // Используем метод из Diary, который ищет запись (и создает, если нет)

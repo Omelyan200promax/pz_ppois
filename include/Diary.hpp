@@ -10,10 +10,14 @@
 class Diary
 {
 private:
+    // Все записи дневника (по одной на каждый день)
     std::vector<DiaryEntry> entries;
+
+    // Имя файла для сохранения и загрузки данных
     std::string filename = "diary.bin";
 
 public:
+    // Конструктор с возможностью указать имя файла (по умолчанию "diary.bin")
     explicit Diary(const std::string &file = "diary.bin");
 
     // Загрузка и сохранение

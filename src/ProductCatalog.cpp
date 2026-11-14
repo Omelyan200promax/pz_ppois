@@ -6,16 +6,14 @@
 #include <cctype>
 #include <limits>
 
-// Конструктор
-
+// Конструктор: создает каталог и автоматически загружает данные из файла
 ProductCatalog::ProductCatalog(const std::string &file)
     : filename(file)
 {
     loadFromFile();
 }
 
-// Загрузка и сохранение
-
+// Загружает каталог продуктов из бинарного файла
 void ProductCatalog::loadFromFile()
 {
     std::ifstream in(filename, std::ios::binary);
@@ -31,8 +29,7 @@ void ProductCatalog::loadFromFile()
     std::size_t count = 0;
     in.read(reinterpret_cast<char *>(&count), sizeof(count));
 
-    // Проверка на корректность: размер файла должен
-    // соответствовать count записям
+    // Проверка на корректность: размер файла должен соответствовать count записям
     if (!in)
         return;
 
@@ -49,6 +46,7 @@ void ProductCatalog::loadFromFile()
     }
 }
 
+// Сохраняет каталог продуктов в бинарный файл
 void ProductCatalog::saveToFile() const
 {
     std::ofstream out(filename, std::ios::binary | std::ios::trunc);
@@ -70,8 +68,7 @@ void ProductCatalog::saveToFile() const
     }
 }
 
-// Добавление, удаление, редактирование
-
+// Добавляет новый продукт в каталог (с проверкой на дубликаты по имени)
 bool ProductCatalog::addProduct(const Product &p)
 {
     // Не допускаем дубликатов по имени
@@ -83,6 +80,7 @@ bool ProductCatalog::addProduct(const Product &p)
     return true;
 }
 
+// Удаляет продукт из каталога по его названию
 bool ProductCatalog::removeProduct(const std::string &name)
 {
     for (auto it = products.begin(); it != products.end(); ++it)
@@ -96,6 +94,7 @@ bool ProductCatalog::removeProduct(const std::string &name)
     return false;
 }
 
+// Редактирует существующий продукт (заменяет данные по имени)
 bool ProductCatalog::editProduct(const std::string &name,
                                  const Product &newData)
 {
@@ -107,8 +106,7 @@ bool ProductCatalog::editProduct(const std::string &name,
     return true;
 }
 
-// Поиск
-
+// Ищет продукт по точному названию и возвращает указатель на него (или nullptr)
 Product *ProductCatalog::findByName(const std::string &name)
 {
     for (auto &p : products)
@@ -121,8 +119,7 @@ Product *ProductCatalog::findByName(const std::string &name)
     return nullptr;
 }
 
-// Поиск по части названия (без учёта регистра)
-
+// Ищет продукты по части названия (без учета регистра) и возвращает их список
 std::vector<Product> ProductCatalog::searchByName(const std::string &query) const
 {
     std::vector<Product> result;
@@ -150,16 +147,14 @@ std::vector<Product> ProductCatalog::searchByName(const std::string &query) cons
     return result;
 }
 
-// Сортировка
-
+// Сортирует продукты в каталоге по алфавиту
 void ProductCatalog::sortAlphabetically()
 {
     // Используем operator< из Product
     std::sort(products.begin(), products.end());
 }
 
-// Вывод
-
+// Выводит список всех продуктов в консоль (компактный формат)
 void ProductCatalog::printAll() const
 {
     if (products.empty())
@@ -175,8 +170,7 @@ void ProductCatalog::printAll() const
     }
 }
 
-// Фильтры
-
+// Фильтрует продукты по диапазону калорийности на 100 г
 std::vector<Product>
 ProductCatalog::filterByCalories(double min, double max) const
 {
@@ -191,6 +185,7 @@ ProductCatalog::filterByCalories(double min, double max) const
     return result;
 }
 
+// Фильтрует продукты по количеству белков (в диапазоне +- delta)
 std::vector<Product>
 ProductCatalog::filterByProteins(double value, double delta) const
 {
@@ -206,6 +201,7 @@ ProductCatalog::filterByProteins(double value, double delta) const
     return result;
 }
 
+// Фильтрует продукты по количеству жиров (в диапазоне +- delta)
 std::vector<Product>
 ProductCatalog::filterByFats(double value, double delta) const
 {
@@ -221,6 +217,7 @@ ProductCatalog::filterByFats(double value, double delta) const
     return result;
 }
 
+// Фильтрует продукты по количеству углеводов (в диапазоне +- delta)
 std::vector<Product>
 ProductCatalog::filterByCarbs(double value, double delta) const
 {
@@ -236,18 +233,19 @@ ProductCatalog::filterByCarbs(double value, double delta) const
     return result;
 }
 
-// Вспомогательные методы
-
+// Проверяет, пуст ли каталог продуктов
 bool ProductCatalog::isEmpty() const
 {
     return products.empty();
 }
 
+// Возвращает текущее количество продуктов в каталоге
 std::size_t ProductCatalog::size() const
 {
     return products.size();
 }
 
+// Возвращает константную ссылку на вектор всех продуктов (для чтения)
 const std::vector<Product> &ProductCatalog::getAll() const
 {
     return products;

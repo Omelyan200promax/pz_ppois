@@ -4,36 +4,71 @@
 #include <limits>
 #include <cmath>
 
-// Геттеры
-
+// Возвращает никнейм пользователя
 std::string UserProfile::getNickname() const { return std::string(nickname); }
+
+// Возвращает возраст пользователя
 int UserProfile::getAge() const { return age; }
+
+// Возвращает текущий вес пользователя
 double UserProfile::getWeight() const { return weight; }
+
+// Возвращает рост пользователя
 double UserProfile::getHeight() const { return height; }
+
+// Возвращает процент жира пользователя
 double UserProfile::getBodyFat() const { return bodyFat; }
+
+// Возвращает целевой вес пользователя
 double UserProfile::getTargetWeight() const { return targetWeight; }
+
+// Возвращает выбранную цель (похудение, набор и т.д.)
 Goal UserProfile::getGoal() const { return goal; }
+
+// Возвращает пол пользователя
 Gender UserProfile::getGender() const { return gender; }
+
+// Возвращает рассчитанную дневную норму калорий
 double UserProfile::getDailyCalories() const { return dailyCalories; }
+
+// Возвращает рассчитанную дневную норму белков
 double UserProfile::getDailyProteins() const { return dailyProteins; }
+
+// Возвращает рассчитанную дневную норму жиров
 double UserProfile::getDailyFats() const { return dailyFats; }
+
+// Возвращает рассчитанную дневную норму углеводов
 double UserProfile::getDailyCarbs() const { return dailyCarbs; }
+
+// Возвращает рассчитанную дневную норму воды
 double UserProfile::getDailyWater() const { return dailyWater; }
+
+// Возвращает рассчитанную дневную норму клетчатки
 double UserProfile::getDailyFiber() const { return dailyFiber; }
+
+// Возвращает базовый обмен веществ (BMR)
 double UserProfile::getBasalMetabolism() const { return basalMetabolism; }
+
+// Возвращает рекомендуемую норму сна
 double UserProfile::getSleepHours() const { return sleepHours; }
+
+// Возвращает текущий статус пользователя
 Status UserProfile::getStatus() const { return status; }
+
+// Возвращает флаг наличия новой информации (для отображения звездочки)
 bool UserProfile::getHasNewInfo() const { return hasNewInfo; }
+
+// Возвращает средний расход калорий на физическую активность в день
 double UserProfile::getAvgActivityCalories() const { return avgActivityCalories; }
 
-// Сеттеры
-
+// Устанавливает никнейм (с защитой от переполнения массива)
 void UserProfile::setNickname(const std::string &nick)
 {
     std::strncpy(nickname, nick.c_str(), 31);
     nickname[31] = '\0';
 }
 
+// Устанавливает средний расход на активности и сразу пересчитывает все нормы
 void UserProfile::setAvgActivityCalories(double cal)
 {
     if (cal >= 0)
@@ -47,8 +82,7 @@ void UserProfile::setAvgActivityCalories(double cal)
     }
 }
 
-// Ввод данных при первом запуске
-
+// Запрашивает у пользователя личные данные при первом запуске
 void UserProfile::inputInitialData()
 {
     std::cout << "========================================\n";
@@ -124,8 +158,7 @@ void UserProfile::inputInitialData()
     updateNorms();
 }
 
-// Вспомогательные методы
-
+// Рассчитывает базовый обмен веществ (BMR) по формуле Миффлина-Сан Жеора
 void UserProfile::calcBasalMetabolism()
 {
     if (gender == Gender::MALE)
@@ -138,12 +171,14 @@ void UserProfile::calcBasalMetabolism()
     }
 }
 
+// Рассчитывает все дневные нормы (калории, БЖУ, вода, сон) на основе данных профиля
 void UserProfile::calcDailyNorms()
 {
     calcBasalMetabolism();
 
     double weightDelta = weight - targetWeight;
 
+    // Проверка на безопасную скорость похудения
     if (weightDelta > 0 && weeksToGoal > 0)
     {
         double weeklyLoss = weightDelta / weeksToGoal;
@@ -156,6 +191,7 @@ void UserProfile::calcDailyNorms()
 
     double maintenanceCalories = basalMetabolism + avgActivityCalories;
 
+    // Корректировка калорий в зависимости от цели
     if (goal == Goal::LOSE_WEIGHT)
     {
         dailyCalories = maintenanceCalories - 500;
@@ -173,6 +209,7 @@ void UserProfile::calcDailyNorms()
         dailyCalories = maintenanceCalories;
     }
 
+    // Проценты БЖУ в зависимости от цели
     double pPerc = 0.30, fPerc = 0.30, cPerc = 0.40;
     if (goal == Goal::CUTTING)
     {
@@ -187,13 +224,16 @@ void UserProfile::calcDailyNorms()
         cPerc = 0.50;
     }
 
+    // Перевод процентов в граммы
     dailyProteins = (dailyCalories * pPerc) / 4.0;
     dailyFats = (dailyCalories * fPerc) / 9.0;
     dailyCarbs = (dailyCalories * cPerc) / 4.0;
 
+    // Нормы воды и клетчатки
     dailyWater = weight * 35.0;
     dailyFiber = 25.0;
 
+    // Расчет нормы сна в зависимости от возраста, пола и активности
     if (age < 18)
         sleepHours = 9.0;
     else if (age < 65)
@@ -209,8 +249,10 @@ void UserProfile::calcDailyNorms()
         sleepHours -= 0.5;
 }
 
+// Публичный метод для принудительного пересчета норм
 void UserProfile::updateNorms() { calcDailyNorms(); }
 
+// Проверяет, является ли выбранный темп похудения безопасным
 bool UserProfile::isWeightLossSafe() const
 {
     if (weight > targetWeight && weeksToGoal > 0)
@@ -221,6 +263,7 @@ bool UserProfile::isWeightLossSafe() const
     return true;
 }
 
+// Обновляет статус пользователя на основе количества дней подряд (стрика)
 void UserProfile::updateStatus(int streakDays)
 {
     Status newStatus = Status::BEGINNER;
@@ -238,18 +281,18 @@ void UserProfile::updateStatus(int streakDays)
         newStatus = Status::STARTED;
     }
 
-    // Если статус повысился, включаем звездочку
-    if (newStatus != status && status < newStatus)
-    { // нужно перегрузить оператор < для enum class или просто сравнить через приведение к int
+    // Сравниваем статусы через приведение к int (так как enum class)
+    if (static_cast<int>(newStatus) > static_cast<int>(status))
+    {
         status = newStatus;
-        hasNewInfo = true;
+        hasNewInfo = true; // Включаем звездочку
     }
 }
 
+// Убирает флаг новой информации (звездочку) после просмотра
 void UserProfile::markInfoAsRead() { hasNewInfo = false; }
 
-// Вывод
-
+// Выводит подробную информацию о профиле и рассчитанных нормах в консоль
 void UserProfile::print() const
 {
     std::cout << "--- Личные данные ---\n";
@@ -282,8 +325,7 @@ void UserProfile::print() const
     std::cout << "Норма сна: " << sleepHours << " ч\n";
 }
 
-// Сброс (кроме никнейма)
-
+// Сбрасывает все данные профиля, кроме никнейма (пункт "Результат")
 void UserProfile::reset()
 {
     age = 0;
@@ -307,8 +349,7 @@ void UserProfile::reset()
     hasNewInfo = false;
 }
 
-// Бинарный файл
-
+// Сохраняет профиль пользователя в бинарный файл
 void UserProfile::save(std::ofstream &out) const
 {
     out.write(nickname, 32);
@@ -335,6 +376,7 @@ void UserProfile::save(std::ofstream &out) const
     out.write(reinterpret_cast<const char *>(&hasNewInfo), sizeof(bool));
 }
 
+// Загружает профиль пользователя из бинарного файла
 void UserProfile::load(std::ifstream &in)
 {
     in.read(nickname, 32);
@@ -363,6 +405,7 @@ void UserProfile::load(std::ifstream &in)
     in.read(reinterpret_cast<char *>(&hasNewInfo), sizeof(bool));
 }
 
+// Возвращает размер записи профиля в файле (в байтах)
 std::size_t UserProfile::binarySize()
 {
     return 32 + sizeof(int) + sizeof(double) * 9 + sizeof(Goal) + sizeof(Gender) + sizeof(int) + sizeof(Status) + sizeof(bool);
