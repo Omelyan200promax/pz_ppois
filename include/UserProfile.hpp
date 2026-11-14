@@ -57,6 +57,7 @@ private:
     double dailyFiber = 0.0;
     double basalMetabolism = 0.0; // BMR (базовый обмен веществ)
     double sleepHours = 0.0;
+    double optimalActivityCal = 0.0;
 
     // --- Статус и уведомления ---
     Status status = Status::BEGINNER;
@@ -89,6 +90,7 @@ public:
     Status getStatus() const;
     bool getHasNewInfo() const;
     double getAvgActivityCalories() const;
+    double getOptimalActivityCal() const;
 
     // --- Сеттеры ---
     void setNickname(const std::string &nick);
@@ -112,6 +114,9 @@ public:
     void save(std::ofstream &out) const;
     void load(std::ifstream &in);
     static std::size_t binarySize(); // Размер записи в файле (в байтах)
+
+    // Рассчитывает рекомендуемое (безопасное) время достижения цели в неделях
+    int getOptimalWeeks() const;
 };
 
 #endif // USERPROFILE_HPP

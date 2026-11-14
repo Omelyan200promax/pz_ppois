@@ -3,6 +3,7 @@
 #include <iomanip>   // std::setw, std::fixed, std::setprecision
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::transform, std::tolower
+#include <locale>
 
 // Конструктор: создает продукт с заданными названием и пищевой ценностью на 100 г
 Product::Product(const std::string &name_,

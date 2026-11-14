@@ -41,6 +41,9 @@ public:
     bool isEmpty() const;
     std::size_t size() const;
 
+    // Полностью очищает дневник
+    void clear();
+
     // Геттер для чтения (без копирования)
     const std::vector<DiaryEntry> &getAll() const;
 };

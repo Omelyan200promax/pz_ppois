@@ -145,23 +145,33 @@ void Date::inputFromConsole()
         std::string input;
         std::getline(std::cin >> std::ws, input);
 
-        // Если введено 'now', берем текущую системную дату
+        // Если введено 'now', берём текущую системную дату
         if (input == "now")
         {
             std::time_t t = std::time(nullptr);
             std::tm *now = std::localtime(&t);
             day = now->tm_mday;
-            month = now->tm_mon + 1;    // tm_mon от 0 до 11
-            year = now->tm_year + 1900; // tm_year от 1900
+            month = now->tm_mon + 1;
+            year = now->tm_year + 1900;
             return;
         }
 
-        Date temp = fromString(input);
-        if (temp.isValid())
+        // Пытаемся распарсить строку напрямую
+        std::istringstream iss(input);
+        char dot1, dot2;
+        int d_val = 0, m_val = 0, y_val = 0;
+
+        if (iss >> d_val >> dot1 >> m_val >> dot2 >> y_val && dot1 == '.' && dot2 == '.')
         {
-            *this = temp;
-            return;
+            Date temp(d_val, m_val, y_val);
+            if (temp.isValid())
+            {
+                *this = temp;
+                return;
+            }
         }
+
+        // Если не получилось или дата некорректна
         std::cout << "Ошибка: некорректная дата. Попробуйте снова.\n";
     }
 }

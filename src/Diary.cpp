@@ -139,3 +139,9 @@ const std::vector<DiaryEntry> &Diary::getAll() const
 {
     return entries;
 }
+
+// Полностью очищает все записи дневника
+void Diary::clear()
+{
+    entries.clear();
+}

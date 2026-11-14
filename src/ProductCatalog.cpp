@@ -95,8 +95,7 @@ bool ProductCatalog::removeProduct(const std::string &name)
 }
 
 // Редактирует существующий продукт (заменяет данные по имени)
-bool ProductCatalog::editProduct(const std::string &name,
-                                 const Product &newData)
+bool ProductCatalog::editProduct(const std::string &name, const Product &newData)
 {
     Product *p = findByName(name);
     if (p == nullptr)
@@ -119,7 +118,7 @@ Product *ProductCatalog::findByName(const std::string &name)
     return nullptr;
 }
 
-// Ищет продукты по части названия (без учета регистра) и возвращает их список
+// Ищет продукты по части названия (без учета регистра для латиницы)
 std::vector<Product> ProductCatalog::searchByName(const std::string &query) const
 {
     std::vector<Product> result;

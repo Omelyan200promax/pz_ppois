@@ -28,7 +28,7 @@ private:
 
 public:
     // Конструкторы
-    Product(); // пустой продукт
+    Product() = default; // пустой продукт
     Product(const std::string &name,
             double calories,
             double proteins,

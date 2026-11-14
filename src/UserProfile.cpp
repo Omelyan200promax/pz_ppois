@@ -61,6 +61,9 @@ bool UserProfile::getHasNewInfo() const { return hasNewInfo; }
 // Возвращает средний расход калорий на физическую активность в день
 double UserProfile::getAvgActivityCalories() const { return avgActivityCalories; }
 
+// Возвращает норму калорий, которые пользователь должен тратить на физическую активность
+double UserProfile::getOptimalActivityCal() const { return optimalActivityCal; }
+
 // Устанавливает никнейм (с защитой от переполнения массива)
 void UserProfile::setNickname(const std::string &nick)
 {
@@ -97,7 +100,8 @@ void UserProfile::inputInitialData()
     std::getline(std::cin >> std::ws, tmpNick);
     setNickname(tmpNick);
 
-    auto readDouble = [](const std::string &prompt) -> double
+    // Улучшенная лямбда с проверкой минимума и максимума
+    auto readDouble = [](const std::string &prompt, double minV, double maxV) -> double
     {
         double v;
         while (true)
@@ -105,9 +109,9 @@ void UserProfile::inputInitialData()
             std::cout << prompt;
             if (std::cin >> v)
             {
-                if (v <= 0.0)
+                if (v < minV || v > maxV)
                 {
-                    std::cout << "Ошибка: значение должно быть больше нуля.\n";
+                    std::cout << "Ошибка: значение должно быть от " << minV << " до " << maxV << ".\n";
                     continue;
                 }
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -119,17 +123,24 @@ void UserProfile::inputInitialData()
         }
     };
 
-    std::cout << "Введите пол (1 - мужской, 2 - женский): ";
-    int g;
-    std::cin >> g;
+    // Проверка пола
+    int g = 0;
+    while (g != 1 && g != 2)
+    {
+        std::cout << "Введите пол (1 - мужской, 2 - женский): ";
+        std::cin >> g;
+        if (g != 1 && g != 2)
+            std::cout << "Ошибка: введите 1 или 2.\n";
+    }
     gender = (g == 2) ? Gender::FEMALE : Gender::MALE;
 
-    age = (int)readDouble("Возраст (лет): ");
-    weight = readDouble("Текущий вес (кг): ");
-    height = readDouble("Рост (см): ");
-    bodyFat = readDouble("Процент жира (%): ");
-    targetWeight = readDouble("Целевой вес (кг): ");
-    weeksToGoal = (int)readDouble("Желаемое время достижения цели (недель): ");
+    // Теперь передаем реальные границы для каждого поля
+    age = (int)readDouble("Возраст (лет): ", 10, 120);
+    weight = readDouble("Текущий вес (кг): ", 30, 300);
+    height = readDouble("Рост (см): ", 100, 250);
+    bodyFat = readDouble("Процент жира (%): ", 3, 60);
+    targetWeight = readDouble("Целевой вес(кг): ", 30, 300);
+    weeksToGoal = (int)readDouble("Желаемое время достижения цели (недель): ", 1, 200);
 
     std::cout << "Выберите цель:\n";
     std::cout << "1. Похудение\n2. Сушка\n3. Набор массы\n4. Поддержание веса\n>";
@@ -151,10 +162,7 @@ void UserProfile::inputInitialData()
         break;
     }
 
-    // Ручной ввод активности убран.
-    // Это значение будет установлено из Menu после выбора активностей пользователем.
     avgActivityCalories = 0.0;
-
     updateNorms();
 }
 
@@ -183,13 +191,29 @@ void UserProfile::calcDailyNorms()
     {
         double weeklyLoss = weightDelta / weeksToGoal;
         double maxSafeLoss = weight * 0.01;
-        if (weeklyLoss > maxSafeLoss)
+        // Проверка на безопасную скорость похудения
+        if (weightDelta > 0 && weeksToGoal > 0)
         {
-            std::cout << "ВНИМАНИЕ: Вы хотите худеть слишком быстро! Это опасно для здоровья.\n";
+            double weeklyLoss = weightDelta / weeksToGoal;
+            double maxSafeLoss = weight * 0.01;
+
+            if (weeklyLoss > maxSafeLoss)
+            {
+                std::cout << "ВНИМАНИЕ: Вы хотите худеть слишком быстро! Это опасно для здоровья.\n";
+
+                int optimal = getOptimalWeeks();
+                if (optimal > 0)
+                {
+                    std::cout << "Рекомендуемое безопасное время для достижения цели ("
+                              << weightDelta << " кг): примерно " << optimal << " недель.\n";
+                }
+            }
         }
     }
 
-    double maintenanceCalories = basalMetabolism + avgActivityCalories;
+    // Умножаем BMR на 1.2 (базовая активность в течение дня: ходьба, учеба и т.д.)
+    // И прибавляем калории, сожженные на конкретных тренировках
+    double maintenanceCalories = (basalMetabolism * 1.2) + avgActivityCalories;
 
     // Корректировка калорий в зависимости от цели
     if (goal == Goal::LOSE_WEIGHT)
@@ -247,6 +271,9 @@ void UserProfile::calcDailyNorms()
         sleepHours += 0.5;
     else if (avgActivityCalories < 100.0)
         sleepHours -= 0.5;
+
+    // Считаем рекомендуемую норму активности (15% от калорий)
+    optimalActivityCal = dailyCalories * 0.15;
 }
 
 // Публичный метод для принудительного пересчета норм
@@ -261,6 +288,22 @@ bool UserProfile::isWeightLossSafe() const
         return weeklyLoss <= (weight * 0.01);
     }
     return true;
+}
+
+// Рассчитывает оптимальное время для безопасного достижения цели (0.5-1% в неделю)
+int UserProfile::getOptimalWeeks() const
+{
+    // Если цель не похудение или данные некорректны, возвращаем 0
+    if (weight <= targetWeight || weight <= 0.0)
+        return 0;
+
+    double weightDelta = weight - targetWeight;
+
+    // Берем средний безопасный темп: 0.75% от текущего веса в неделю
+    double safeWeeklyLoss = weight * 0.0075;
+
+    // Округляем вверх (чтобы точно успеть)
+    return static_cast<int>(std::ceil(weightDelta / safeWeeklyLoss));
 }
 
 // Обновляет статус пользователя на основе количества дней подряд (стрика)
@@ -323,6 +366,16 @@ void UserProfile::print() const
     std::cout << "БЖУ: " << dailyProteins << " / " << dailyFats << " / " << dailyCarbs << " г\n";
     std::cout << "Вода: " << dailyWater << " мл, Клетчатка: " << dailyFiber << " г\n";
     std::cout << "Норма сна: " << sleepHours << " ч\n";
+
+    // Вывод рекомендуемого срока, если есть цель похудеть
+    if (weight > targetWeight)
+    {
+        int optimal = getOptimalWeeks();
+        if (optimal > 0)
+        {
+            std::cout << "Рекомендуемое безопасное время до цели: " << optimal << " нед.\n";
+        }
+    }
 }
 
 // Сбрасывает все данные профиля, кроме никнейма (пункт "Результат")
@@ -371,6 +424,7 @@ void UserProfile::save(std::ofstream &out) const
     out.write(reinterpret_cast<const char *>(&dailyFiber), sizeof(double));
     out.write(reinterpret_cast<const char *>(&basalMetabolism), sizeof(double));
     out.write(reinterpret_cast<const char *>(&sleepHours), sizeof(double));
+    out.write(reinterpret_cast<const char *>(&optimalActivityCal), sizeof(double));
 
     out.write(reinterpret_cast<const char *>(&status), sizeof(Status));
     out.write(reinterpret_cast<const char *>(&hasNewInfo), sizeof(bool));
@@ -400,6 +454,7 @@ void UserProfile::load(std::ifstream &in)
     in.read(reinterpret_cast<char *>(&dailyFiber), sizeof(double));
     in.read(reinterpret_cast<char *>(&basalMetabolism), sizeof(double));
     in.read(reinterpret_cast<char *>(&sleepHours), sizeof(double));
+    in.read(reinterpret_cast<char *>(&optimalActivityCal), sizeof(double));
 
     in.read(reinterpret_cast<char *>(&status), sizeof(Status));
     in.read(reinterpret_cast<char *>(&hasNewInfo), sizeof(bool));
