@@ -37,7 +37,14 @@ void UserProfile::setNickname(const std::string &nick)
 void UserProfile::setAvgActivityCalories(double cal)
 {
     if (cal >= 0)
+    {
         avgActivityCalories = cal;
+        // Если профиль уже инициализирован, сразу пересчитываем нормы
+        if (weight > 0.0 && height > 0.0 && age > 0)
+        {
+            updateNorms();
+        }
+    }
 }
 
 // Ввод данных при первом запуске
@@ -103,7 +110,9 @@ void UserProfile::inputInitialData()
         break;
     }
 
-    avgActivityCalories = readDouble("Средний расход на активности в день (ккал): ");
+    // Ручной ввод активности убран.
+    // Это значение будет установлено из Menu после выбора активностей пользователем.
+    avgActivityCalories = 0.0;
 
     updateNorms();
 }
@@ -243,6 +252,7 @@ void UserProfile::print() const
 
     std::cout << std::fixed << std::setprecision(1);
     std::cout << "BMR (базовый обмен): " << basalMetabolism << " ккал\n";
+    std::cout << "Средний расход на активности: " << avgActivityCalories << " ккал/день\n";
     std::cout << "Норма калорий: " << dailyCalories << " ккал\n";
     std::cout << "БЖУ: " << dailyProteins << " / " << dailyFats << " / " << dailyCarbs << " г\n";
     std::cout << "Вода: " << dailyWater << " мл, Клетчатка: " << dailyFiber << " г\n";
