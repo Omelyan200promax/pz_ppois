@@ -143,7 +143,7 @@ bool DiaryEntry::operator<(const DiaryEntry &other) const
 
 // Вывод в консоль
 
-void DiaryEntry::print(double waterNorm, double sleepNorm, double weightKg) const
+void DiaryEntry::print(double waterNorm, double sleepNorm, double weightKg, double bmr) const
 {
     std::cout << "==============================\n";
     std::cout << "Запись за " << date.toString() << "\n";
@@ -163,7 +163,7 @@ void DiaryEntry::print(double waterNorm, double sleepNorm, double weightKg) cons
               << "Кл " << getTotalFiber() << "\n";
 
     water.print(waterNorm);
-    sleep.print(sleepNorm);
+    sleep.print(sleepNorm, bmr);
 
     std::cout << "Физическая активность:\n";
     if (activities.empty())

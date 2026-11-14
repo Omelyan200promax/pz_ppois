@@ -73,8 +73,7 @@ public:
 
     // Вывод всей записи.
     // Нормы и вес необязательны: если значение > 0, оно показывается.
-    void print(double waterNorm = 0.0, double sleepNorm = 0.0, double weightKg = 0.0) const;
-
+    void print(double waterNorm = 0.0, double sleepNorm = 0.0, double weightKg = 0.0, double bmr = 0.0) const;
     // Бинарный файл
     void save(std::ofstream &out) const;
     void load(std::ifstream &in);

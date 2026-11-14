@@ -20,12 +20,24 @@ ActivityCatalog::ActivityCatalog(const std::string &file)
 void ActivityCatalog::fillDefaults()
 {
     activities.clear();
-    activities.push_back(PhysicalActivity("Ходьба", 3.5));
-    activities.push_back(PhysicalActivity("Бег", 9.8));
-    activities.push_back(PhysicalActivity("Плавание", 6.0));
-    activities.push_back(PhysicalActivity("Велосипед", 7.5));
+
+    // Низкая активность
+    activities.push_back(PhysicalActivity("Ходьба", 3.0));
     activities.push_back(PhysicalActivity("Йога", 2.5));
+    activities.push_back(PhysicalActivity("Пилатес", 3.0));
+    activities.push_back(PhysicalActivity("Растяжка", 2.3));
+
+    // Средняя активность
+    activities.push_back(PhysicalActivity("Плавание", 6.0));
+    activities.push_back(PhysicalActivity("Велосипед", 6.0));
+    activities.push_back(PhysicalActivity("Танцы", 5.5));
     activities.push_back(PhysicalActivity("Силовая тренировка", 5.0));
+    activities.push_back(PhysicalActivity("Домашняя уборка", 4.5));
+
+    // Высокая активность
+    activities.push_back(PhysicalActivity("Бег", 9.8));
+    activities.push_back(PhysicalActivity("Скакалка", 10.0));
+    activities.push_back(PhysicalActivity("Бокс / Кикбоксинг", 9.0));
 }
 
 // Загрузка и сохранение

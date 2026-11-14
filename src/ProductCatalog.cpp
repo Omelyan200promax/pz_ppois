@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <cctype>
 #include <limits>
 
 // Конструктор
@@ -118,6 +119,35 @@ Product *ProductCatalog::findByName(const std::string &name)
         }
     }
     return nullptr;
+}
+
+// Поиск по части названия (без учёта регистра)
+
+std::vector<Product> ProductCatalog::searchByName(const std::string &query) const
+{
+    std::vector<Product> result;
+    std::string lowerQuery = query;
+
+    // Приводим запрос к нижнему регистру
+    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(),
+                   [](unsigned char c)
+                   { return std::tolower(c); });
+
+    for (const auto &p : products)
+    {
+        std::string pName = p.getName();
+        // Приводим название продукта к нижнему регистру
+        std::transform(pName.begin(), pName.end(), pName.begin(),
+                       [](unsigned char c)
+                       { return std::tolower(c); });
+
+        // Если в названии есть искомая подстрока
+        if (pName.find(lowerQuery) != std::string::npos)
+        {
+            result.push_back(p);
+        }
+    }
+    return result;
 }
 
 // Сортировка

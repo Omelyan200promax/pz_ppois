@@ -22,6 +22,16 @@ void SleepRecord::setHours(double v)
         hours = v;
 }
 
+// Расчёт калорий
+
+double SleepRecord::calcBurnedKcal(double basalMetabolism) const
+{
+    if (basalMetabolism <= 0.0 || hours <= 0.0)
+        return 0.0;
+    // Организм тратит примерно BMR/24 калорий в час даже во сне
+    return (basalMetabolism / 24.0) * hours;
+}
+
 // Ввод с консоли
 
 void SleepRecord::inputFromConsole()
@@ -53,12 +63,14 @@ void SleepRecord::inputFromConsole()
 
 // Вывод в консоль
 
-void SleepRecord::print(double norm) const
+void SleepRecord::print(double norm, double bmr) const
 {
     std::cout << std::fixed << std::setprecision(1);
     std::cout << "Сон: " << hours << " ч";
     if (norm > 0.0)
         std::cout << " (норма: " << norm << " ч)";
+    if (bmr > 0.0)
+        std::cout << " | Потрачено во сне: " << calcBurnedKcal(bmr) << " ккал";
     std::cout << "\n";
 }
 
