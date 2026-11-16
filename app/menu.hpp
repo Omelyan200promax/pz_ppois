@@ -8,6 +8,7 @@
 #include "Calendar.hpp"
 #include "Report.hpp"
 #include <string>
+#include <fstream>
 
 class Menu
 {
@@ -40,6 +41,8 @@ private:
     // Подменю дневника
     void showDiaryEntryMenu(DiaryEntry &entry);
     void addProductToMeal(DiaryEntry &entry);
+public:
+    void run(); 
 };
 
 #endif // MENU_HPP
