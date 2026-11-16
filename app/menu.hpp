@@ -41,7 +41,7 @@ private:
     // Подменю дневника
     void showDiaryEntryMenu(DiaryEntry &entry);
     void addProductToMeal(DiaryEntry &entry);
-    public:
+public:
     void run(); 
 };
 
